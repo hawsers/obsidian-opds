@@ -427,6 +427,102 @@ describe("OPDSClient", () => {
     });
   });
 
+  describe("searchBooks", () => {
+    const feedXmlWithSearchLink = (link: string) => `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>urn:test:catalog</id>
+  <title>Test Library</title>
+  <updated>2026-01-01T00:00:00Z</updated>
+  ${link}
+</feed>`;
+
+    const resultsXml = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+  <id>urn:test:results</id>
+  <title>Search results</title>
+  <updated>2026-01-01T00:00:00Z</updated>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <entry>
+    <id>urn:book:pride</id>
+    <title>Pride and Prejudice</title>
+    <updated>2026-01-01T00:00:00Z</updated>
+  </entry>
+</feed>`;
+
+    it("uses an inline {searchTerms} template directly", async () => {
+      mockFeedXml(feedXmlWithSearchLink(
+        `<link rel="search" href="https://example.com/search?q={searchTerms}" type="application/atom+xml"/>`
+      ));
+      mockFeedXml(resultsXml);
+
+      const feed = await client.searchBooks("pride", "https://example.com/catalog.xml");
+
+      expect(feed.entry).toHaveLength(1);
+      expect(feed.entry[0].title).toBe("Pride and Prejudice");
+      expect(vi.mocked(requestUrl)).toHaveBeenCalledTimes(2);
+      expect(vi.mocked(requestUrl).mock.calls[1][0].url).toBe("https://example.com/search?q=pride");
+    });
+
+    it("resolves an OpenSearch description document to a Url template", async () => {
+      mockFeedXml(feedXmlWithSearchLink(
+        `<link rel="search" href="https://example.com/catalog/opensearch.xml" type="application/opensearchdescription+xml"/>`
+      ));
+      mockFeedXml(`<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Test</ShortName>
+  <Url type="text/html" template="https://example.com/html?q={searchTerms}"/>
+  <Url type="application/atom+xml;profile=opds-catalog;kind=acquisition" template="search/results.xml#{searchTerms}"/>
+</OpenSearchDescription>`);
+      mockFeedXml(resultsXml);
+
+      const feed = await client.searchBooks("pride", "https://example.com/catalog.xml");
+
+      expect(feed.entry[0].title).toBe("Pride and Prejudice");
+      expect(vi.mocked(requestUrl)).toHaveBeenCalledTimes(3);
+      expect(vi.mocked(requestUrl).mock.calls[1][0].url).toBe("https://example.com/catalog/opensearch.xml");
+      expect(vi.mocked(requestUrl).mock.calls[2][0].url).toBe(
+        "https://example.com/catalog/search/results.xml#pride"
+      );
+    });
+
+    it("prefers an atom Url over other types", async () => {
+      mockFeedXml(feedXmlWithSearchLink(
+        `<link rel="search" href="https://example.com/opensearch.xml" type="application/opensearchdescription+xml"/>`
+      ));
+      mockFeedXml(`<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <Url type="text/html" template="https://example.com/html?q={searchTerms}"/>
+  <Url type="application/atom+xml" template="https://example.com/opds?q={searchTerms}"/>
+</OpenSearchDescription>`);
+      mockFeedXml(resultsXml);
+
+      await client.searchBooks("pride", "https://example.com/catalog.xml");
+
+      expect(vi.mocked(requestUrl).mock.calls[2][0].url).toBe("https://example.com/opds?q=pride");
+    });
+
+    it("throws when the description has no usable template", async () => {
+      mockFeedXml(feedXmlWithSearchLink(
+        `<link rel="search" href="https://example.com/opensearch.xml" type="application/opensearchdescription+xml"/>`
+      ));
+      mockFeedXml(`<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Test</ShortName>
+</OpenSearchDescription>`);
+
+      await expect(client.searchBooks("pride", "https://example.com/catalog.xml"))
+        .rejects.toThrow("Search not supported by this catalog");
+      expect(vi.mocked(requestUrl)).toHaveBeenCalledTimes(2);
+    });
+
+    it("throws when the feed has no search link", async () => {
+      mockFeedXml(feedXmlWithSearchLink(`<link rel="self" href="https://example.com/catalog.xml"/>`));
+
+      await expect(client.searchBooks("pride", "https://example.com/catalog.xml"))
+        .rejects.toThrow("Search not supported by this catalog");
+    });
+  });
+
   describe("getLibrary", () => {
     it("extracts catalogs from feed links", async () => {
       mockFeedXml(SAMPLE_NAV_FEED);

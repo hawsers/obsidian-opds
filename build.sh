@@ -12,7 +12,7 @@ npm run build
 
 echo ""
 echo "=== Obsidian CLI Integration Test ==="
-if obsidian plugin:reload id=obsidian-opds 2>/dev/null; then
+if obsidian plugin:reload id=opds-client 2>/dev/null; then
   ./tests/obsidian-test.sh
 else
   echo "Skipped: Obsidian not running (start Obsidian, then re-run for live tests)"

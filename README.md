@@ -2,6 +2,20 @@
 
 Browse, search, and download books from [OPDS](https://opds-spec.org/) catalogs inside Obsidian.
 
+## Introduction
+
+OPDS Client brings a library into your vault: browse catalogs, search for books, and download them — all without leaving Obsidian.
+
+![OPDS Client demo: open the library, browse a catalog, search, open book details](demo.gif)
+
+What the plugin gives you:
+
+- **Books live next to your notes** — downloads land in a vault folder (default `Books`), so EPUBs and PDFs sit beside the notes you already link, search, and review.
+- **Stay in flow** — the library is a first-class Obsidian view: find a book and fetch it without switching to a browser tab.
+- **Standards-based and self-hostable** — OPDS 1.x (Atom/XML) works with thousands of public catalogs and self-hosted servers (Calibre, Komga, Kavita, and many more), so you choose where your books come from.
+- **Private by default** — no telemetry, no third-party accounts; server credentials stay in the plugin's `data.json` inside your own vault.
+- **Obsidian-native UX** — ribbon and commands, breadcrumb navigation, debounced search, and a settings panel that fits the rest of your setup.
+
 ## Features
 
 - Multiple OPDS servers with **none / basic / bearer / OAuth2 (client credentials)** auth
@@ -31,7 +45,7 @@ All settings live in *Settings → OPDS Client*.
 
 ### OPDS servers
 
-On first launch the plugin seeds two free public catalogs (Project Gutenberg, Feedbooks Test Catalog). They are ordinary servers — edit or delete them like any other. Use **+ Add OPDS Server** to create your own.
+On first launch the plugin seeds no public catalogs — add servers yourself with **+ Add OPDS Server** (see [Awesome OPDS servers](#awesome-opds-servers) below for public and self-hostable options). Servers are ordinary records — edit or delete them like any other.
 
 Each server card shows its name, URL, auth type, last refresh status (catalog count / error message), and the detected OPDS version, with these actions:
 

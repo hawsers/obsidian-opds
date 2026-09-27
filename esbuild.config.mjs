@@ -40,8 +40,8 @@ async function buildPlugin() {
 
     if (existsSync("manifest.json")) {
       const pluginDirs = [
-        join(process.cwd(), ".obsidian", "plugins", "obsidian-opds"),
-        ...(vaultDir ? [join(vaultDir, ".obsidian", "plugins", "obsidian-opds")] : []),
+        join(process.cwd(), ".obsidian", "plugins", "opds-client"),
+        ...(vaultDir ? [join(vaultDir, ".obsidian", "plugins", "opds-client")] : []),
         ...extraVaultPluginDirs
       ];
       for (const pluginDir of pluginDirs) {
@@ -59,7 +59,7 @@ async function buildPlugin() {
         }
       }
       console.log(
-        "Plugin copied to local .obsidian/plugins/obsidian-opds" +
+        "Plugin copied to local .obsidian/plugins/opds-client" +
         (vaultDir ? ` and ${vaultDir}` : " (vault copy skipped)") +
         (extraVaultPluginDirs.length ? " and OBSIDIAN_PLUGIN_DIR targets" : "")
       );

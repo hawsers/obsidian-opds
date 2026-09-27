@@ -8,11 +8,11 @@
     "build": "node esbuild.config.mjs production",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:obsidian": "npm run build && obsidian plugin:reload id=obsidian-opds && ./tests/obsidian-test.sh",
+    "test:obsidian": "npm run build && obsidian plugin:reload id=opds-client && ./tests/obsidian-test.sh",
     "lint": "eslint src --ext ts",
     "format": "prettier --write src/**/*.ts",
-    "clean": "rm -f main.js main.js.map && rm -rf .obsidian/plugins/obsidian-opds",
-    "clean:vault": "[ -z \"$OBSIDIAN_VAULT\" ] || rm -rf \"$OBSIDIAN_VAULT/.obsidian/plugins/obsidian-opds\"",
+    "clean": "rm -f main.js main.js.map && rm -rf .obsidian/plugins/opds-client",
+    "clean:vault": "[ -z \"$OBSIDIAN_VAULT\" ] || rm -rf \"$OBSIDIAN_VAULT/.obsidian/plugins/opds-client\"",
     "clean:all": "npm run clean && npm run clean:vault"
   },
   "keywords": [

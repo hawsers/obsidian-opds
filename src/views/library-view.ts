@@ -1518,7 +1518,7 @@ export class OPDSLibraryView extends ItemView {
     const btn = msg.createEl("button", { text: "Open Settings", cls: "mod-cta" });
     btn.onclick = () => {
       this.plugin.app.setting.open();
-      this.plugin.app.setting.openTabById("obsidian-opds");
+      this.plugin.app.setting.openTabById("opds-client");
     };
   }
 }

@@ -586,10 +586,37 @@ export class OPDSClient {
       throw new Error("Search not supported by this catalog");
     }
 
-    const searchUrl = searchLink.href.includes("{searchTerms}")
-      ? searchLink.href.replace("{searchTerms}", encodeURIComponent(query))
-      : searchLink.href;
+    let template = searchLink.href;
+    if (!template.includes("{searchTerms}")) {
+      const resolved = await this.resolveOpenSearchTemplate(template, catalogUrl);
+      if (!resolved) {
+        throw new Error("Search not supported by this catalog");
+      }
+      template = resolved;
+    }
+
+    const searchUrl = template.replace("{searchTerms}", encodeURIComponent(query));
     return this.fetchFeed(searchUrl);
+  }
+
+  private async resolveOpenSearchTemplate(descriptionHref: string, baseUrl?: string): Promise<string | null> {
+    const descriptionUrl = this.resolveUrl(descriptionHref, baseUrl || "");
+    if (!descriptionUrl) return null;
+    const response = await this.requestFeed(descriptionUrl);
+    if (response.status !== 200) return null;
+
+    const doc = parser.parse(response.text);
+    const description = doc?.OpenSearchDescription;
+    if (!description) return null;
+
+    const raw = Array.isArray(description.Url) ? description.Url : [description.Url];
+    const candidates = raw.filter(
+      (u: any) => u && typeof u["@_template"] === "string" && u["@_template"].includes("{searchTerms}")
+    );
+    if (candidates.length === 0) return null;
+
+    const preferred = candidates.find((u: any) => String(u["@_type"] || "").includes("atom")) ?? candidates[0];
+    return this.resolveUrl(preferred["@_template"], descriptionUrl);
   }
 
   async authenticate(force = false): Promise<string | null> {
