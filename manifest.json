@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-opds",
+  "name": "OPDS Client",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "Connect to OPDS services to browse, search, and download books",
+  "author": "hawsers",
+  "isDesktopOnly": false
+}
