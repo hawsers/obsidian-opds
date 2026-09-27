@@ -87,8 +87,6 @@ Public catalogs you can add out of the box, plus self-hostable servers that expo
 | [The Anarchist Library](https://theanarchistlibrary.org/) | Multilingual free library (`https://theanarchistlibrary.org/opds`) |
 | [Feedbooks Test Catalog](https://github.com/Feedbooks/opds-test-catalog) | Feature-complete test feed for exercising OPDS clients |
 
-Removed or demoted after liveness checks: Internet Archive Bookserver (host not answering), OAPEN OPDS (empty catalog body), Feedbooks market feed (bot challenge / empty), ManyBooks OPDS (bot challenge), OpenEdition OPDS (host not answering from this network), Wikisource export (bot challenge). Prefer site UI for those.
-
 ### Self-hostable servers
 
 Beyond the usual [awesome-opds](https://github.com/opds-community/awesome-opds) servers (Calibre, Amusewiki, Kavita, Komga, Stump, Calibre2OPDS), these also ship OPDS feeds:
