@@ -2,9 +2,7 @@
 node_modules/
 
 # Build
-main.js
 main.js.map
-main.css
 main.css.map
 
 # Test / tooling
